@@ -19,7 +19,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -27,8 +26,6 @@ const client = new Client({
         GatewayIntentBits.MessageContent
     ]
 });
-
-
 
 app.get('/', (req, res) => {
     res.json({ 
@@ -86,6 +83,75 @@ async function getRobloxThumbnail(userId) {
     return fallbackUrl;
 }
 
+async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, raiserName, amount) {
+    console.log(`🔄 Creating donation image with avatars: ${donatorAvatar}, ${raiserAvatar}`);
+    
+    try {
+        const canvas = createCanvas(700, 200);
+        const ctx = canvas.getContext('2d');
+        
+        console.log('✅ Canvas created');
+        
+        const donationColor = getColor(amount);
+        console.log(`✅ Donation color: ${donationColor}`);
+        
+        ctx.clearRect(0, 0, 700, 200);
+        console.log('✅ Canvas cleared');
+        
+        // Try loading images with error handling
+        console.log('🔄 Loading donator image...');
+        const donatorImg = await loadImage(donatorAvatar);
+        console.log('✅ Donator image loaded');
+        
+        console.log('🔄 Loading raiser image...');
+        const raiserImg = await loadImage(raiserAvatar);
+        console.log('✅ Raiser image loaded');
+        
+        // Draw donator avatar
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(138, 100, 45, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(donatorImg, 93, 55, 90, 90);
+        ctx.restore();
+        console.log('✅ Donator avatar drawn');
+        
+        // Draw raiser avatar
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(568, 100, 45, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(raiserImg, 523, 55, 90, 90);
+        ctx.restore();
+        console.log('✅ Raiser avatar drawn');
+        
+        // Draw borders
+        ctx.strokeStyle = donationColor;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(138, 100, 45, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(568, 100, 45, 0, Math.PI * 2);
+        ctx.stroke();
+        console.log('✅ Avatar borders drawn');
+        
+        // Draw names
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 8;
+        ctx.globalCompositeOperation = 'source-over';
+        
+        ctx.strokeText(`@${donatorName}`, 138, 170);
+        ctx.fillText(`@${donatorName}`, 138, 170);
+        ctx.strokeText(`@${raiserName}`, 568, 170);
+        ctx.fillText(`@${raiserName}`, 568, 170);
+        console.log('✅ Names drawn');
+        
         // Draw amount with Robux image
         ctx.fillStyle = donationColor;
         ctx.font = 'bold 42px Arial';
@@ -138,6 +204,25 @@ async function getRobloxThumbnail(userId) {
             ctx.fillText(amountText, 350, 100);
             console.log('✅ Amount drawn with text fallback');
         }
+        
+        // Draw "donated to" text
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 28px Arial';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 8;
+        ctx.strokeText('donated to', 350, 140);
+        ctx.fillText('donated to', 350, 140);
+        console.log('✅ "donated to" text drawn');
+        
+        console.log('✅ Image creation completed successfully');
+        return canvas.toBuffer();
+        
+    } catch (error) {
+        console.error('❌ Error in createDonationImage:', error);
+        console.error('Error details:', error.message, error.stack);
+        throw error;
+    }
+}
 
 app.post('/donation', async (req, res) => {
     console.log('📥 FULL REQUEST RECEIVED:');
