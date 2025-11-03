@@ -7,7 +7,7 @@ const express = require('express');
 const app = express();
 app.use(cors());
 app.use(express.json());
-registerFont('C:\\Users\\Maen\\Desktop\\donobot\\fonts\\Metropolis-Bold.otf', { family: 'Metropolis' });
+registerFont('./Metropolis-Bold.ott', { family: 'Metropolis' });
 app.use((req, res, next) => {
     console.log('🌐 INCOMING REQUEST:');
     console.log('Method:', req.method);
