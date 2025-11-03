@@ -1,10 +1,9 @@
 const { Client, GatewayIntentBits, AttachmentBuilder } = require('discord.js');
 const axios = require('axios');
-const { createCanvas, loadImage, registerFont } = require('@napi-rs/canvas');
+const { createCanvas, loadImage, registerFont } = require('canvas');
 const path = require('path');
 const cors = require('cors');
 const express = require('express');
-
 const app = express();
 app.use(cors());
 app.use(express.json());
