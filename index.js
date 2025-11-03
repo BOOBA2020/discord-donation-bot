@@ -151,7 +151,7 @@ async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, rai
         ctx.fillText(`@${raiserName}`, 568, 170);
         console.log('✅ Names drawn');
         
-        // Draw amount with Robux image
+        // Draw amount with Robux imae
         ctx.fillStyle = donationColor;
         ctx.font = 'bold 42px Metropolis';
         ctx.textAlign = 'center';
