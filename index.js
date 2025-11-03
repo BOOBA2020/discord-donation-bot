@@ -153,7 +153,7 @@ async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, rai
         
         // Draw amount with Robux imae
         ctx.fillStyle = donationColor;
-        ctx.font = 'bold 42px "DejaVu Sans"';
+        ctx.font = 'bold 42px Arial';
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 8;
@@ -206,7 +206,7 @@ async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, rai
         
         // Draw "donated to" text
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 28px "DejaVu Sans"';
+        ctx.font = 'bold 28px Arial';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 8;
         ctx.strokeText('donated to', 350, 140);
