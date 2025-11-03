@@ -242,63 +242,45 @@ async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, rai
 
 app.post('/donation', async (req, res) => {
     console.log('📥 FULL REQUEST RECEIVED:');
-    console.log('Headers:', req.headers);
     console.log('Body:', req.body);
-    console.log('Body type:', typeof req.body);
-    
-    // Check if body exists
-    if (!req.body) {
-        console.log('❌ No body received');
-        return res.status(400).json({ success: false, error: 'No body received' });
-    }
     
     const { DonatorId, RaiserId, DonatorName, RaiserName, Amount } = req.body;
     
-    console.log('📋 Parsed fields:');
-    console.log('- DonatorId:', DonatorId, typeof DonatorId);
-    console.log('- RaiserId:', RaiserId, typeof RaiserId); 
-    console.log('- DonatorName:', DonatorName, typeof DonatorName);
-    console.log('- RaiserName:', RaiserName, typeof RaiserName);
-    console.log('- Amount:', Amount, typeof Amount);
+    // Handle anonymous users
+    const isDonatorAnonymous = DonatorId === 1 || DonatorName === "Anonymous" || !DonatorName.startsWith('@');
+    const isRaiserAnonymous = RaiserId === 1 || RaiserName === "Anonymous" || !RaiserName.startsWith('@');
     
-    // Check each field individually
-    const missingFields = [];
-    if (!DonatorId) missingFields.push('DonatorId');
-    if (!RaiserId) missingFields.push('RaiserId');
-    if (!DonatorName) missingFields.push('DonatorName');
-    if (!RaiserName) missingFields.push('RaiserName');
-    if (!Amount) missingFields.push('Amount');
+    // Use default Roblox avatar (ID 1) for anonymous users
+    const donatorAvatarId = isDonatorAnonymous ? 1 : DonatorId;
+    const raiserAvatarId = isRaiserAnonymous ? 1 : RaiserId;
     
-    if (missingFields.length > 0) {
-        console.log('❌ Missing fields:', missingFields);
-        return res.status(400).json({ 
-            success: false, 
-            error: 'Missing fields: ' + missingFields.join(', ') 
-        });
-    }
+    // Set display names to "@Anonymous" for anonymous users
+    const donatorDisplayName = isDonatorAnonymous ? "Anonymous" : DonatorName.replace('@', '');
+    const raiserDisplayName = isRaiserAnonymous ? "Anonymous" : RaiserName.replace('@', '');
     
-    console.log('✅ All fields present, processing donation...');
+    console.log('👤 Processed names:');
+    console.log('- Donator:', donatorDisplayName, '(anonymous:', isDonatorAnonymous, ')');
+    console.log('- Raiser:', raiserDisplayName, '(anonymous:', isRaiserAnonymous, ')');
     
     try {
-        const donatorAvatar = await getRobloxThumbnail(DonatorId);
-        const raiserAvatar = await getRobloxThumbnail(RaiserId);
-        const donationColor = getColor(Amount);
+        const donatorAvatar = await getRobloxThumbnail(donatorAvatarId);
+        const raiserAvatar = await getRobloxThumbnail(raiserAvatarId);
         
         const imageBuffer = await createDonationImage(
             donatorAvatar, 
             raiserAvatar, 
-            DonatorName, 
-            RaiserName, 
+            donatorDisplayName, 
+            raiserDisplayName, 
             Amount
         );
 
-      const attachment = new AttachmentBuilder(imageBuffer, { name: 'donation.png' });
+        const attachment = new AttachmentBuilder(imageBuffer, { name: 'donation.png' });
 
         const channel = await client.channels.fetch('1420042400968999025');
         await channel.send({
-            content: `${getDonationEmoji(Amount)} \`@${DonatorName}\` donated **<:smallrobux:1434592131271626772>${formatCommas(Amount)} Robux** to \`@${RaiserName}\``,
+            content: `${getDonationEmoji(Amount)} \`@${donatorDisplayName}\` donated **<:smallrobux:1434592131271626772>${formatCommas(Amount)} Robux** to \`@${raiserDisplayName}\``,
             embeds: [{
-                color: parseInt(donationColor.replace('#', ''), 16),
+                color: parseInt(getColor(Amount).replace('#', ''), 16),
                 image: { url: "attachment://donation.png" },
                 timestamp: new Date().toISOString(),
                 footer: { text: "Donated on" }
