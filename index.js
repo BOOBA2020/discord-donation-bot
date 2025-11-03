@@ -275,7 +275,7 @@ app.post('/donation', async (req, res) => {
             Amount
         );
 
-        const attachment = new AttachmentBuilder(imageBuffer, 'donation.png');
+      const attachment = new AttachmentBuilder(imageBuffer, { name: 'donation.png' });
 
         const channel = await client.channels.fetch('1420042400968999025');
         await channel.send({
