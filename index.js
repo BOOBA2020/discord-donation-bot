@@ -86,131 +86,58 @@ async function getRobloxThumbnail(userId) {
     return fallbackUrl;
 }
 
-async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, raiserName, amount) {
-        console.log(`🔄 Creating donation image with avatars: ${donatorAvatar}, ${raiserAvatar}`);
-    
-    // Validate avatars exist
-    if (!donatorAvatar || !raiserAvatar) {
-        throw new Error(`Missing avatars: donator=${donatorAvatar}, raiser=${raiserAvatar}`);
-    }
-    const canvas = createCanvas(700, 200);
-    const ctx = canvas.getContext('2d');
-    
-    const donationColor = getColor(amount);
-    
-    ctx.clearRect(0, 0, 700, 200);
-    
-    if (amount >= 1000000) {
-        const gradient = ctx.createLinearGradient(0, 170, 0, 200);
-        gradient.addColorStop(0, donationColor + '05');
-        gradient.addColorStop(0.5, donationColor + '22');
-        gradient.addColorStop(1, donationColor + '43');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 170, 700, 50);
-    }
-    if (amount >= 10000000) {
-        const gradient = ctx.createLinearGradient(0, 50, 0, 200);
-        gradient.addColorStop(0, donationColor + '10');
-        gradient.addColorStop(0.3, donationColor + '40');
-        gradient.addColorStop(1, donationColor + '80');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 50, 700, 150);
-    }
+        // Draw amount with Robux image
+        ctx.fillStyle = donationColor;
+        ctx.font = 'bold 42px Arial';
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 8;
 
-    try {
-        const donatorImg = await loadImage(donatorAvatar);
-        const raiserImg = await loadImage(raiserAvatar);
+        console.log('🔄 Attempting to load Robux image...');
         
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(138, 100, 45, 0, Math.PI * 2);  
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(donatorImg, 93, 55, 90, 90);  
-        ctx.restore();
-        
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(568, 100, 45, 0, Math.PI * 2);  
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(raiserImg, 523, 55, 90, 90);  
-        ctx.restore();
-        
-        ctx.strokeStyle = donationColor;
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.arc(138, 100, 45, 0, Math.PI * 2);  
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.arc(568, 100, 45, 0, Math.PI * 2);  
-        ctx.stroke();
-        
-    } catch (error) {
-        console.error('Error loading avatars:', error);
-    }
-    
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 16px Arial';
-    ctx.textAlign = 'center';
+        try {
+            const robuxImageUrl = 'https://cdn.discordapp.com/emojis/1381864904767832104.png';
+            console.log(`🔄 Loading Robux image from: ${robuxImageUrl}`);
+            
+            const robuxImage = await loadImage(robuxImageUrl);
+            console.log('✅ Robux image loaded successfully');
+            
+            const text = `${formatCommas(amount)}`;
+            const textWidth = ctx.measureText(text).width;
+            
+            const imageSize = 60;
+            const xPos = 365 - (textWidth / 2) - imageSize - 1;
+            const yPos = 55;
 
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 8;  
-    ctx.globalCompositeOperation = 'source-over'; 
+            console.log(`🔄 Creating temp canvas for Robux image...`);
+            const tempCanvas = createCanvas(imageSize, imageSize);
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            console.log('🔄 Drawing Robux image to temp canvas...');
+            tempCtx.drawImage(robuxImage, 0, 0, imageSize, imageSize);
+            
+            console.log('🔄 Applying color to Robux image...');
+            tempCtx.globalCompositeOperation = 'source-in';
+            tempCtx.fillStyle = donationColor;
+            tempCtx.fillRect(0, 0, imageSize, imageSize);
 
-    ctx.strokeText(`@${donatorName}`, 138, 170);
-    ctx.fillText(`@${donatorName}`, 138, 170);
-
-    ctx.strokeText(`@${raiserName}`, 568, 170);
-    ctx.fillText(`@${raiserName}`, 568, 170);
-    
-    ctx.fillStyle = donationColor;
-    ctx.font = 'bold 42px Arial';
-    ctx.textAlign = 'center';
-    
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 8;
-
-    try {
-        const robuxImage = await loadImage('https://cdn.discordapp.com/emojis/1381864904767832104.png');
-        
-        const text = `${formatCommas(amount)}`;
-        const textWidth = ctx.measureText(text).width;
-        
-        const imageSize = 60;
-        const xPos = 365 - (textWidth / 2) - imageSize - 1;
-        const yPos = 55;
-
-        const tempCanvas = createCanvas(imageSize, imageSize);
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        tempCtx.drawImage(robuxImage, 0, 0, imageSize, imageSize);
-        
-        tempCtx.globalCompositeOperation = 'source-in';
-        tempCtx.fillStyle = donationColor;
-        tempCtx.fillRect(0, 0, imageSize, imageSize);
-
-        ctx.drawImage(tempCanvas, xPos, yPos);
-        
-        ctx.strokeText(text, 365, 100);
-        ctx.fillText(text, 365, 100);
-        
-    } catch (error) {
-        ctx.strokeText(`⏣ ${formatCommas(amount)}`, 350, 100);
-        ctx.fillText(`⏣ ${formatCommas(amount)}`, 350, 100);
-    }
-    
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 28px Arial';
-    
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 8;
-    ctx.strokeText('donated to', 350, 140);
-    ctx.fillText('donated to', 350, 140);
-
-    return canvas.toBuffer();
-}
+            console.log('🔄 Drawing colored Robux image to main canvas...');
+            ctx.drawImage(tempCanvas, xPos, yPos);
+            
+            console.log('🔄 Drawing amount text...');
+            ctx.strokeText(text, 365, 100);
+            ctx.fillText(text, 365, 100);
+            
+            console.log('✅ Robux image and amount drawn successfully');
+            
+        } catch (robuxError) {
+            console.error('❌ Robux image failed, using text fallback:', robuxError.message);
+            // Fallback to text with Robux symbol
+            const amountText = `⏣ ${formatCommas(amount)}`;
+            ctx.strokeText(amountText, 350, 100);
+            ctx.fillText(amountText, 350, 100);
+            console.log('✅ Amount drawn with text fallback');
+        }
 
 app.post('/donation', async (req, res) => {
     console.log('📥 FULL REQUEST RECEIVED:');
