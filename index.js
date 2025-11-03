@@ -66,15 +66,33 @@ function getColor(robux) {
 
 async function getRobloxThumbnail(userId) {
     try {
+        console.log(`🔄 Fetching thumbnail for user: ${userId}`);
         const response = await axios.get(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
+        
         if (response.data.data && response.data.data[0] && response.data.data[0].imageUrl) {
-            return response.data.data[0].imageUrl;
+            const avatarUrl = response.data.data[0].imageUrl;
+            console.log(`✅ Got avatar URL: ${avatarUrl}`);
+            return avatarUrl;
+        } else {
+            console.log(`❌ No avatar found for user ${userId}, using fallback`);
         }
-    } catch (error) {}
-    return `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
+    } catch (error) {
+        console.log(`❌ Error fetching avatar for ${userId}:`, error.message);
+    }
+    
+    // Fallback URL
+    const fallbackUrl = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
+    console.log(`🔄 Using fallback URL: ${fallbackUrl}`);
+    return fallbackUrl;
 }
 
 async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, raiserName, amount) {
+        console.log(`🔄 Creating donation image with avatars: ${donatorAvatar}, ${raiserAvatar}`);
+    
+    // Validate avatars exist
+    if (!donatorAvatar || !raiserAvatar) {
+        throw new Error(`Missing avatars: donator=${donatorAvatar}, raiser=${raiserAvatar}`);
+    }
     const canvas = createCanvas(700, 200);
     const ctx = canvas.getContext('2d');
     
