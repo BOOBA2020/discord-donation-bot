@@ -278,20 +278,16 @@ app.post('/donation', async (req, res) => {
         const attachment = new AttachmentBuilder(imageBuffer, 'donation.png');
 
         const channel = await client.channels.fetch('1420042400968999025');
-await channel.send({
-    content: `${getDonationEmoji(Amount)} \`@${DonatorName}\` donated **<:smallrobux:1434592131271626772>${formatCommas(Amount)} Robux** to \`@${RaiserName}\``,
-    embeds: [{
-        color: parseInt(donationColor.replace('#', ''), 16),
-        image: {
-            url: "attachment://donation.png"
-        },
-        timestamp: new Date().toISOString(),
-        footer: {
-            text: "Donated on"
-        }
-    }],
-    files: [attachment]
-});
+        await channel.send({
+            content: `${getDonationEmoji(Amount)} \`@${DonatorName}\` donated **<:smallrobux:1434592131271626772>${formatCommas(Amount)} Robux** to \`@${RaiserName}\``,
+            embeds: [{
+                color: parseInt(donationColor.replace('#', ''), 16),
+                image: { url: "attachment://donation.png" },
+                timestamp: new Date().toISOString(),
+                footer: { text: "Donated on" }
+            }],
+            files: [attachment]
+        });
         
         console.log('✅ Donation processed successfully');
         res.json({ success: true });
