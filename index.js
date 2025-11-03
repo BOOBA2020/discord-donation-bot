@@ -156,7 +156,7 @@ async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, rai
         
         // Draw names
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 16px Arial';
+        ctx.font = 'bold 18px Arial';
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 4;
