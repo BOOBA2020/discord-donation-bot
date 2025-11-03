@@ -7,7 +7,7 @@ const express = require('express');
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+registerFont('C:\\Users\\Maen\\Desktop\\donobot\\fonts\\Metropolis-Bold.otf', { family: 'Metropolis' });
 app.use((req, res, next) => {
     console.log('🌐 INCOMING REQUEST:');
     console.log('Method:', req.method);
@@ -153,7 +153,7 @@ async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, rai
         
         // Draw amount with Robux image
         ctx.fillStyle = donationColor;
-        ctx.font = 'bold 42px Arial';
+        ctx.font = 'bold 42px Metropolis';
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 8;
@@ -206,7 +206,7 @@ async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, rai
         
         // Draw "donated to" text
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 28px Arial';
+        ctx.font = 'bold 28px Metropolis';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 8;
         ctx.strokeText('donated to', 350, 140);
