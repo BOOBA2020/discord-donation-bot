@@ -96,6 +96,23 @@ async function createDonationImage(donatorAvatar, raiserAvatar, donatorName, rai
         
         ctx.clearRect(0, 0, 700, 200);
         console.log('✅ Canvas cleared');
+
+            if (amount >= 1000000) {
+        const gradient = ctx.createLinearGradient(0, 170, 0, 200);
+        gradient.addColorStop(0, donationColor + '05');
+        gradient.addColorStop(0.5, donationColor + '22');
+        gradient.addColorStop(1, donationColor + '43');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 170, 700, 50);
+    }
+    if (amount >= 10000000) {
+        const gradient = ctx.createLinearGradient(0, 50, 0, 200);
+        gradient.addColorStop(0, donationColor + '10');
+        gradient.addColorStop(0.3, donationColor + '40');
+        gradient.addColorStop(1, donationColor + '80');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 50, 700, 150);
+    }
         
         // Try loading images with error handling
         console.log('🔄 Loading donator image...');
